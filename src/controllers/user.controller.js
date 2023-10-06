@@ -6,7 +6,7 @@ class UserController {
 
         const input = {
             email: body.email,
-            preferredName: body.preferredName,
+            preferredFirstName: body.preferredFirstName,
             firstName: body.firstName,
             lastName: body.lastName,
             password: body.password
@@ -16,7 +16,7 @@ class UserController {
             await userService.signUp(input);
             res.status(201).json({ message: "Success" });
         } catch (error) {
-            res.status(500).json({ message: Error });
+            res.status(500).json({ message: error.message });
         }
     };
 }
