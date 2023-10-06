@@ -10,10 +10,11 @@ generator client {
 model User {
     id                 String   @id @default(auto()) @map("_id") @db.ObjectId
     email              String   @unique
-    preferredFirstName String
+    preferredFirstName String?
     firstName          String
     lastName           String
     password           String
+    random             String
     createdAt          DateTime @default(now())
     updatedAt          DateTime @updatedAt
 }
