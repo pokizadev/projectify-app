@@ -14,7 +14,7 @@ model User {
     firstName          String
     lastName           String
     password           String
-    random             String
+    activationToken    String?
     createdAt          DateTime @default(now())
     updatedAt          DateTime @updatedAt
 }
