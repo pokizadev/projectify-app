@@ -1,5 +1,7 @@
 import { prisma } from "../prisma/index.js";
 import { bcrypt } from "../utils/bcrypt.js";
+import { mailer } from "../utils/mailer.js";
+import { crypto } from "../utils/crypto.js";
 
 class UserService {
     signUp = async (input) => {
@@ -54,6 +56,37 @@ class UserService {
                 throw new Error("Invalid Credentials");
             }
         } catch (error) {
+            throw error;
+        }
+    };
+    activate = async (token) => {
+        try {
+            const hashedActivationToken = crypto.hash(token);
+            const user = await prisma.user.findFirst({
+                where: {
+                    activationToken: hashedActivationToken
+                },
+                select: {
+                    id: true,
+                    activationToken: true
+                }
+            });
+
+            if (!user) {
+                throw new Error("Invalid Token");
+            }
+
+            await prisma.user.update({
+                where: {
+                    id: user.id
+                },
+                data: {
+                    status: "ACTIVE",
+                    activationToken: ""
+                }
+            });
+        } catch (error) {
+            console.log(error);
             throw error;
         }
     };
