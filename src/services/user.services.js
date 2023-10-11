@@ -1,15 +1,23 @@
 import { prisma } from "../prisma/index.js";
-import { bcrypt } from "../utils/bcrypt.js";
-import { mailer } from "../utils/mailer.js";
 import { crypto } from "../utils/crypto.js";
+import { mailer } from "../utils/mailer.js";
+import { bcrypt } from "../utils/bcrypt.js";
 import { date } from "../utils/date.js";
 
 class UserService {
     signUp = async (input) => {
         try {
+            const hashedPassword = await bcrypt.hash(input.password);
+            const activationToken = crypto.createToken();
+            const hashedActivationToken = crypto.hash(activationToken);
             await prisma.user.create({
-                data: input
+                data: {
+                    ...input,
+                    password: hashedPassword,
+                    activationToken: hashedActivationToken
+                }
             });
+            await mailer.sendActivationMail(input.email, activationToken);
         } catch (error) {
             throw new Error(error);
         }
