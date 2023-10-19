@@ -131,24 +131,9 @@ class UserController {
         }
     };
     getMe = async (req, res) => {
-        const { headers } = req;
-        if (!headers.authorization) {
-            res.status(401).json({
-                message: "You are not logged in. Please Log In"
-            });
-        }
-        const [prefix, token] = headers.authorization.split(" ");
-        if (!prefix || !token) {
-            res.status(400).json({
-                message: "Invalid Login"
-            });
-        }
-
-        jwt.verify(token, process.env.JWT_SECRET);
-
+        const { userId } = req;
         try {
-            const payload = jwt.verify(token, process.env.JWT_SECRET);
-            const me = await userService.getMe(payload.userId);
+            const me = await userService.getMe(userId);
 
             res.status(200).json({
                 data: me
@@ -161,11 +146,10 @@ class UserController {
     };
 
     logout = async (req, res) => {
-        const { sessionId } = req;
         try {
-            await userService.logout(sessionId);
-
-            res.status(204).send();
+            res.status(200).send({
+                token: ""
+            });
         } catch (error) {
             res.status(500).json({
                 message: error.message

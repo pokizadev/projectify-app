@@ -211,7 +211,7 @@ class UserService {
         }
     };
 
-    logout = async (sessionId) => {
+    logout = async (userId) => {
         const hashedSessionId = crypto.hash(sessionId);
 
         try {
