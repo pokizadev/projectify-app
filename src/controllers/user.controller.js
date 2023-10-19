@@ -1,4 +1,5 @@
 import { userService } from "../services/user.services.js";
+import jwt from "jsonwebtoken";
 
 class UserController {
     signUp = async (req, res) => {
@@ -32,18 +33,8 @@ class UserController {
         };
 
         try {
-            const sessionId = await userService.login(input);
-            const signedSessionId =
-                "s:" + signature.sign(sessionId, process.env.COOKIE_SECRET);
-            console.log(signedSessionId);
-            console.log(sessionId);
-
-            res.cookie("sessionId", signedSessionId, {
-                maxAge: 10000,
-                httpOnly: true,
-                secure: true
-            });
-            res.send();
+            const jwt = await userService.login(input);
+            res.status(200).json({ token: jwt });
         } catch (error) {
             let statusCode = 500;
             if (error.message === "Invalid Credentials") {
@@ -140,9 +131,24 @@ class UserController {
         }
     };
     getMe = async (req, res) => {
-        const { sessionId } = req;
+        const { headers } = req;
+        if (!headers.authorization) {
+            res.status(401).json({
+                message: "You are not logged in. Please Log In"
+            });
+        }
+        const [prefix, token] = headers.authorization.split(" ");
+        if (!prefix || !token) {
+            res.status(400).json({
+                message: "Invalid Login"
+            });
+        }
+
+        jwt.verify(token, process.env.JWT_SECRET);
+
         try {
-            const me = await userService.getMe(sessionId);
+            const payload = jwt.verify(token, process.env.JWT_SECRET);
+            const me = await userService.getMe(payload.userId);
 
             res.status(200).json({
                 data: me

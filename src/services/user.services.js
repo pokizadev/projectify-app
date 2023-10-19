@@ -3,6 +3,7 @@ import { crypto } from "../utils/crypto.js";
 import { mailer } from "../utils/mailer.js";
 import { bcrypt } from "../utils/bcrypt.js";
 import { date } from "../utils/date.js";
+import jwt from "jsonwebtoken";
 
 class UserService {
     signUp = async (input) => {
@@ -64,16 +65,16 @@ class UserService {
             if (!isPasswordMatches) {
                 throw new Error("Invalid Credentials");
             }
-            const sessionId = crypto.createToken();
-            const hashedSessionId = crypto.hash(sessionId);
-            await prisma.session.create({
-                data: {
-                    sessionId: hashedSessionId,
+            const token = jwt.sign(
+                {
                     userId: user.id
+                },
+                process.env.JWT_SECRET,
+                {
+                    expiresIn: 60
                 }
-            });
-
-            return sessionId;
+            );
+            return token;
         } catch (error) {
             throw error;
         }
@@ -186,27 +187,11 @@ class UserService {
             throw error;
         }
     };
-    getMe = async (sessionId) => {
-        const hashedSessionId = crypto.hash(sessionId);
-
+    getMe = async (userId) => {
         try {
-            const session = await prisma.session.findFirst({
-                where: {
-                    sessionId: hashedSessionId
-                },
-
-                select: {
-                    userId: true
-                }
-            });
-
-            if (!session) {
-                throw new Error("Not Authenticated");
-            }
-
             const user = await prisma.user.findUnique({
                 where: {
-                    id: session.userId
+                    id: userId
                 },
                 select: {
                     firstName: true,
