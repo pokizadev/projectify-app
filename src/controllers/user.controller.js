@@ -1,5 +1,5 @@
 import { userService } from "../services/user.services.js";
-import jwt from "jsonwebtoken";
+import signature from "cookie-signature";
 
 class UserController {
     signUp = async (req, res) => {
@@ -33,8 +33,16 @@ class UserController {
         };
 
         try {
-            const jwt = await userService.login(input);
-            res.status(200).json({ token: jwt });
+            const sessionId = await userService.login(input);
+            const signedSessionId =
+                "s:" + signature.sign(sessionId, process.env.COOKIE_SECRET);
+
+            res.cookie("sessionId", signedSessionId, {
+                maxAge: 10000,
+                httpOnly: true,
+                secure: true
+            });
+            res.send();
         } catch (error) {
             let statusCode = 500;
             if (error.message === "Invalid Credentials") {
@@ -131,9 +139,9 @@ class UserController {
         }
     };
     getMe = async (req, res) => {
-        const { userId } = req;
+        const { sessionId } = req;
         try {
-            const me = await userService.getMe(userId);
+            const me = await userService.getMe(sessionId);
 
             res.status(200).json({
                 data: me
@@ -146,37 +154,11 @@ class UserController {
     };
 
     logout = async (req, res) => {
+        const { sessionId } = req;
         try {
-            res.status(200).send({
-                token: ""
-            });
-        } catch (error) {
-            res.status(500).json({
-                message: error.message
-            });
-        }
-    };
+            await userService.logout(sessionId);
 
-    createTask = async (req, res) => {
-        const { userId, body } = req;
-
-        const input = {
-            title: body.title,
-            description: body.description,
-            due: body.due
-        };
-
-        if (!input.title || !input.due) {
-            res.status(400).json({
-                message: "Title or Due date cannot be empty"
-            });
-            return;
-        }
-        try {
-            const data = await userService.createTask(userId, input);
-            res.status(201).json({
-                data
-            });
+            res.status(204).send();
         } catch (error) {
             res.status(500).json({
                 message: error.message
