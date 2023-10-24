@@ -12,20 +12,6 @@ enum AccountStatus {
     INACTIVE
 }
 
-enum TaskStatus {
-    TODO
-    INPROGRESS
-    DONE
-}
-
-type Tasks {
-    id          String
-    title       String
-    description String
-    due         DateTime
-    status      TaskStatus
-}
-
 model User {
     id                               String        @id @default(auto()) @map("_id") @db.ObjectId
     email                            String        @unique
@@ -39,5 +25,10 @@ model User {
     passwordResetTokenExpirationDate DateTime?
     createdAt                        DateTime      @default(now())
     updatedAt                        DateTime      @updatedAt
-    tasks                            Tasks[]
+}
+
+model Session {
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    sessionId String
+    userId    String @db.ObjectId
 }

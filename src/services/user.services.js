@@ -3,8 +3,6 @@ import { crypto } from "../utils/crypto.js";
 import { mailer } from "../utils/mailer.js";
 import { bcrypt } from "../utils/bcrypt.js";
 import { date } from "../utils/date.js";
-import jwt from "jsonwebtoken";
-import { v4 as uuid } from "uuid";
 
 class UserService {
     signUp = async (input) => {
@@ -12,7 +10,7 @@ class UserService {
             const hashedPassword = await bcrypt.hash(input.password);
             const activationToken = crypto.createToken();
             const hashedActivationToken = crypto.hash(activationToken);
-            await mailer.sendActivationMail(input.email, activationToken);
+
             await prisma.user.create({
                 data: {
                     ...input,
@@ -20,6 +18,7 @@ class UserService {
                     activationToken: hashedActivationToken
                 }
             });
+            await mailer.sendActivationMail(input.email, activationToken);
         } catch (error) {
             throw error;
         }
@@ -66,16 +65,16 @@ class UserService {
             if (!isPasswordMatches) {
                 throw new Error("Invalid Credentials");
             }
-            const token = jwt.sign(
-                {
+            const sessionId = crypto.createToken();
+            const hashedSessionId = crypto.hash(sessionId);
+            await prisma.session.create({
+                data: {
+                    sessionId: hashedSessionId,
                     userId: user.id
-                },
-                process.env.JWT_SECRET,
-                {
-                    expiresIn: 60
                 }
-            );
-            return token;
+            });
+
+            return sessionId;
         } catch (error) {
             throw error;
         }
@@ -188,11 +187,27 @@ class UserService {
             throw error;
         }
     };
-    getMe = async (userId) => {
+    getMe = async (sessionId) => {
+        const hashedSessionId = crypto.hash(sessionId);
+
         try {
+            const session = await prisma.session.findFirst({
+                where: {
+                    sessionId: hashedSessionId
+                },
+
+                select: {
+                    userId: true
+                }
+            });
+
+            if (!session) {
+                throw new Error("Not Authenticated");
+            }
+
             const user = await prisma.user.findUnique({
                 where: {
-                    id: userId
+                    id: session.userId
                 },
                 select: {
                     firstName: true,
@@ -212,53 +227,19 @@ class UserService {
         }
     };
 
-    logout = async (userId) => {
-        const hashedSessionId = crypto.hash(userId);
+    logout = async (sessionId) => {
+        const hashedSessionId = crypto.hash(sessionId);
 
         try {
             await prisma.session.deleteMany({
                 where: {
-                    id: user.id
+                    sessionId: hashedSessionId
                 }
             });
         } catch (error) {
             throw error;
         }
     };
-
-    createTask = async (userId, input) => {
-        const id = uuid();
-        const finalInput = {
-            ...input,
-            status: "TODO",
-            id
-        };
-
-        try {
-            const task = await prisma.user.update({
-                where: {
-                    id: userId
-                },
-                data: {
-                    tasks: {
-                        push: finalInput
-                    }
-                }
-            });
-            return finalInput;
-        } catch (error) {
-            throw error;
-        }
-    };
-
-    updateTask = async (userId, input) => {
-        try {
-            const updatedTask = {};
-        } catch (error) {
-            throw error;
-        }
-    };
-
-    deleteTask = async (userId) => {};
 }
+
 export const userService = new UserService();
