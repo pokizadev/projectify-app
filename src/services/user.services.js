@@ -71,7 +71,7 @@ class UserService {
                 },
                 process.env.JWT_SECRET,
                 {
-                    expiresIn: 60
+                    expiresIn: "2 days"
                 }
             );
             return token;
@@ -206,20 +206,6 @@ class UserService {
             }
 
             return user;
-        } catch (error) {
-            throw error;
-        }
-    };
-
-    logout = async (userId) => {
-        const hashedSessionId = crypto.hash(sessionId);
-
-        try {
-            await prisma.session.deleteMany({
-                where: {
-                    sessionId: hashedSessionId
-                }
-            });
         } catch (error) {
             throw error;
         }
