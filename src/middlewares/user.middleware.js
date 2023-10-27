@@ -10,9 +10,10 @@ class UserMiddleware {
             return;
         }
         const [prefix, token] = headers.authorization.split(" ");
+
         if (!prefix || !token) {
             res.status(400).json({
-                message: "Invalid Login"
+                message: "Invalid Token"
             });
             return;
         }
