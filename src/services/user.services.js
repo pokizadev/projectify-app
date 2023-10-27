@@ -4,6 +4,7 @@ import { mailer } from "../utils/mailer.js";
 import { bcrypt } from "../utils/bcrypt.js";
 import { date } from "../utils/date.js";
 import jwt from "jsonwebtoken";
+import { v4 as uuid } from "uuid";
 
 class UserService {
     signUp = async (input) => {
@@ -207,6 +208,31 @@ class UserService {
             }
 
             return user;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    createTask = async (userId, input) => {
+        const id = uuid();
+        const finalInput = {
+            ...input,
+            status: "TODO",
+            id
+        };
+
+        try {
+            await prisma.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    tasks: {
+                        push: finalInput
+                    }
+                }
+            });
+            return finalInput;
         } catch (error) {
             throw error;
         }
