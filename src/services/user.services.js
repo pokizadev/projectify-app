@@ -237,6 +237,22 @@ class UserService {
             throw error;
         }
     };
+
+    getTasks = async (userId) => {
+        try {
+            const tasks = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    tasks: true
+                }
+            });
+            return tasks;
+        } catch (error) {
+            throw error;
+        }
+    };
 }
 
 export const userService = new UserService();
