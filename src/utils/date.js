@@ -10,7 +10,7 @@ class DateUtil {
         const startDate = date || new Date();
         const unixDate = startDate.setHours(startDate.getHours() + hours);
 
-        return new Data(unixDate);
+        return new Date(unixDate);
     }
 }
 
