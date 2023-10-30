@@ -33,4 +33,10 @@ userRouter.get(
     userController.getTask
 );
 
+userRouter.patch(
+    "/me/tasks/:taskId",
+    userMiddleware.authenticate,
+    userController.updateTask
+);
+
 export { userRouter };
