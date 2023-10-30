@@ -27,4 +27,10 @@ userRouter.get(
     userController.getTasks
 );
 
+userRouter.get(
+    "/me/tasks/:taskId",
+    userMiddleware.authenticate,
+    userController.getTask
+);
+
 export { userRouter };
