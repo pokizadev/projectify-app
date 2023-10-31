@@ -316,6 +316,35 @@ class UserService {
             throw error;
         }
     };
+
+    deleteTask = async (userId, taskId) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    tasks: true
+                }
+            });
+            const tasksToKeep = user.tasks.filter((task) => task.id !== taskId);
+
+            if (tasksToKeep === user.tasks.length) {
+                throw new Error("Task Not Found");
+            }
+
+            await prisma.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    tasks: tasksToKeep
+                }
+            });
+        } catch (error) {
+            throw error;
+        }
+    };
 }
 
 export const userService = new UserService();
