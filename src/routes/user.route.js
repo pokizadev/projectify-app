@@ -39,4 +39,10 @@ userRouter.patch(
     userController.updateTask
 );
 
+userRouter.delete(
+    "/me/tasks/:taskId/delete",
+    userMiddleware.authenticate,
+    userController.deleteTask
+);
+
 export { userRouter };
