@@ -8,7 +8,7 @@ import { v4 as uuid } from "uuid";
 
 class UserService {
     signUp = async (input) => {
-        try {
+
             const hashedPassword = await bcrypt.hash(input.password);
             const activationToken = crypto.createToken();
             const hashedActivationToken = crypto.hash(activationToken);
@@ -21,9 +21,7 @@ class UserService {
                 }
             });
             await mailer.sendActivationMail(input.email, activationToken);
-        } catch (error) {
-            throw error;
-        }
+       
     };
     login = async (input) => {
         try {
