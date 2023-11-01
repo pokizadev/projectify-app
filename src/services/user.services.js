@@ -5,6 +5,7 @@ import { bcrypt } from "../utils/bcrypt.js";
 import { date } from "../utils/date.js";
 import jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
+import {CustomError} from "../utils/custom-error.js"
 
 class UserService {
     signUp = async (input) => {
@@ -24,7 +25,6 @@ class UserService {
        
     };
     login = async (input) => {
-        try {
             const user = await prisma.user.findFirst({
                 where: {
                     email: input.email
@@ -36,7 +36,7 @@ class UserService {
                 }
             });
 
-            if (!user) throw new Error("Invalid Credentials");
+            if (!user) throw new CustomError("User Does not exist", 404 );
 
             if (user.status === "INACTIVE") {
                 const activationToken = crypto.createToken();
@@ -53,8 +53,8 @@ class UserService {
 
                 await mailer.sendActivationMail(input.email, activationToken);
 
-                throw new Error(
-                    "We just sent you activation email. Follow instructions"
+                throw new CustomError(
+                    "We just sent you activation email. Follow instructions", 400
                 );
             }
 
@@ -63,7 +63,7 @@ class UserService {
                 user.password
             );
             if (!isPasswordMatches) {
-                throw new Error("Invalid Credentials");
+                throw new CustomError("Invalid Credentials", 401);
             }
             const token = jwt.sign(
                 {
@@ -75,12 +75,9 @@ class UserService {
                 }
             );
             return token;
-        } catch (error) {
-            throw error;
-        }
+        
     };
     activate = async (token) => {
-        try {
             const hashedActivationToken = crypto.hash(token);
             const user = await prisma.user.findFirst({
                 where: {
@@ -93,7 +90,7 @@ class UserService {
             });
 
             if (!user) {
-                throw new Error("Invalid Token");
+                throw new CustomError("Invalid Token", 404);
             }
 
             await prisma.user.update({
@@ -105,12 +102,9 @@ class UserService {
                     activationToken: null
                 }
             });
-        } catch (error) {
-            throw error;
-        }
+        
     };
     forgotPassword = async (email) => {
-        try {
             const user = await prisma.user.findFirst({
                 where: {
                     email
@@ -121,8 +115,8 @@ class UserService {
             });
 
             if (!user) {
-                throw new Error(
-                    "We could not find a user with the email you provided"
+                throw new CustomError(
+                    "User does not exist with provided email", 404
                 );
             }
 
@@ -140,13 +134,10 @@ class UserService {
             });
 
             await mailer.sendPasswordResetToken(email, passwordResetToken);
-        } catch (error) {
-            throw error;
-        }
+        
     };
 
     resetPassword = async (token, password) => {
-        try {
             const hashedPasswordResetToken = crypto.hash(token);
             const user = await prisma.user.findFirst({
                 where: {
@@ -160,7 +151,7 @@ class UserService {
             });
 
             if (!user) {
-                throw new Error("Invalid Token");
+                throw new CustomError("Invalid Token", 404);
             }
 
             const currentTime = new Date();
@@ -170,7 +161,7 @@ class UserService {
 
             if (tokenExpDate < currentTime) {
                 // Token Expired;
-                throw new Error("Reset Token Expired");
+                throw new CustomError("Password Reset Token Expired");
             }
 
             await prisma.user.update({
@@ -183,12 +174,9 @@ class UserService {
                     passwordResetTokenExpirationDate: null
                 }
             });
-        } catch (error) {
-            throw error;
-        }
+        
     };
     getMe = async (userId) => {
-        try {
             const user = await prisma.user.findUnique({
                 where: {
                     id: userId
@@ -202,13 +190,11 @@ class UserService {
             });
 
             if (!user) {
-                throw new Error("User not found");
+                throw new CustomError("User not found", 404);
             }
 
             return user;
-        } catch (error) {
-            throw error;
-        }
+        
     };
 
     createTask = async (userId, input) => {
@@ -219,7 +205,6 @@ class UserService {
             id
         };
 
-        try {
             await prisma.user.update({
                 where: {
                     id: userId
@@ -231,13 +216,10 @@ class UserService {
                 }
             });
             return finalInput;
-        } catch (error) {
-            throw error;
-        }
+        
     };
 
     getTasks = async (userId) => {
-        try {
             const tasks = await prisma.user.findUnique({
                 where: {
                     id: userId
@@ -247,13 +229,10 @@ class UserService {
                 }
             });
             return tasks;
-        } catch (error) {
-            throw error;
-        }
+       
     };
 
-    getTask = async (userId, taskId) => {
-        try {
+    getTask = async (userId, taskId) => { 
             const user = await prisma.user.findUnique({
                 where: {
                     id: userId
@@ -264,16 +243,13 @@ class UserService {
             });
             const task = user.tasks.find((task) => task.id === taskId);
             if (!task) {
-                throw new Error("Task not found");
+                throw new CustomError("Task not found", 404);
             }
             return task;
-        } catch (error) {
-            throw error;
-        }
+        
     };
 
     updateTask = async (userId, taskId, input) => {
-        try {
             const user = await prisma.user.findUnique({
                 where: {
                     id: userId
@@ -294,7 +270,7 @@ class UserService {
             });
 
             if (!taskToUpdate) {
-                throw new Error("Task not found");
+                throw new CustomError("Task not found", 404);
             }
 
             const updatedTask = {
@@ -310,13 +286,9 @@ class UserService {
                     tasks: [...tasksNotToUpdate, updatedTask]
                 }
             });
-        } catch (error) {
-            throw error;
-        }
     };
 
     deleteTask = async (userId, taskId) => {
-        try {
             const user = await prisma.user.findUnique({
                 where: {
                     id: userId
@@ -328,7 +300,7 @@ class UserService {
             const tasksToKeep = user.tasks.filter((task) => task.id !== taskId);
 
             if (tasksToKeep === user.tasks.length) {
-                throw new Error("Task Not Found");
+                throw new CustomError("Task Not Found", 404);
             }
 
             await prisma.user.update({
@@ -339,9 +311,7 @@ class UserService {
                     tasks: tasksToKeep
                 }
             });
-        } catch (error) {
-            throw error;
-        }
+        
     };
 }
 
