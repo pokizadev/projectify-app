@@ -1,6 +1,7 @@
 import { userService } from "../services/user.services.js";
 import jwt from "jsonwebtoken";
 import { catchAsync } from "../utils/catch-async.js";
+import {CustomError} from "../utils/custom-error.js"
 
 class UserController {
     signUp = catchAsync(async (req, res) => {
@@ -36,11 +37,7 @@ class UserController {
         } = req;
 
         if (!activationToken) {
-            res.status(400).json({
-                message: "Activation Token is missing"
-            });
-
-            return;
+           throw new CustomError("Activation Token is missing", 400)
         }
         await userService.activate(activationToken);
 
@@ -66,28 +63,18 @@ class UserController {
             headers
         } = req;
         if (!password || !passwordConfirm) {
-            res.status(400).json({
-                message: "Password and Password Confirm is required"
-            });
-            return;
+           throw new CustomError("Both Password and Password Confirmation are required")
         }
 
         if (password !== passwordConfirm) {
-            res.status(400).json({
-                message: "Password and Password Confirm does not match"
-            });
-            return;
+            throw new CustomError("Password and Password Confirmation does not match", 400)
         }
         if (!headers.authorization) {
-            res.status(400).json({
-                message: "Reset Token is missing"
-            });
+           throw new CustomError("Password Reset Token is missing"), 400
         }
         const [bearer, token] = headers.authorization.split(" ");
         if (bearer !== "Bearer" || !token) {
-            res.status(400).json({
-                message: "Invalid Token"
-            });
+            throw new CustomError("Invalid Password Reset Token", 400)
         }
 
         await userService.resetPassword(token, password);
@@ -95,6 +82,7 @@ class UserController {
             message: "Password successfully updated"
         });
     });
+
     getMe = catchAsync(async (req, res) => {
         const { userId } = req;
 
@@ -121,10 +109,7 @@ class UserController {
         };
 
         if (!input.title || !input.due) {
-            res.status(400).json({
-                message: "Title or Due date cannot be empty"
-            });
-            return;
+            throw new CustomError(" Both Title or Due date are required")
         }
 
         const data = await userService.createTask(userId, input);
@@ -159,10 +144,7 @@ class UserController {
             input.description = body.description;
         }
         if (!Object.keys(input).length) {
-            res.status(400).json({
-                message: "Updated data not provided"
-            });
-            return;
+            throw new CustomError("Update data is required", 400)
         }
 
         await userService.updateTask(userId, params.taskId, input);
