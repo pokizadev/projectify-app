@@ -8,20 +8,30 @@ import { v4 as uuid } from "uuid";
 import {CustomError} from "../utils/custom-error.js"
 
 class UserService {
-    signUp = async (input) => {
+    signUp = async (userInput, companyInput) => {
 
-            const hashedPassword = await bcrypt.hash(input.password);
+            const hashedPassword = await bcrypt.hash(userInput.password);
             const activationToken = crypto.createToken();
             const hashedActivationToken = crypto.hash(activationToken);
 
             await prisma.user.create({
                 data: {
-                    ...input,
+                    ...userInput,
                     password: hashedPassword,
                     activationToken: hashedActivationToken
-                }
+                },
+                select: {
+                    id: true,
+                },
             });
-            await mailer.sendActivationMail(input.email, activationToken);
+
+            await PrismaClient.companyInput.create({
+                data: {
+                    ...companyInput,
+                    userId: user.id
+                }
+            })
+            await mailer.sendActivationMail(userInput.email, activationToken);
        
     };
     login = async (input) => {
