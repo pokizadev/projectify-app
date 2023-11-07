@@ -3,6 +3,8 @@ import { userRouter } from "./routes/user.route.js";
 import dotenv from "dotenv";
 import { GlobalError } from "./middlewares/global-error.middleware.js";
 // import cookieParser from "cookie-parser";
+import { projectRouter } from "./routes/project.routes.js";
+
 
 dotenv.config();
 
@@ -13,6 +15,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 app.use("/users", userRouter);
+app.use("/projects", projectRouter)
 app.use(GlobalError.handle)
 
 app.listen(PORT, () => {
