@@ -4,4 +4,10 @@ import { teamMemberController } from "../controllers/team-member.controller.js";
 
 const teamMemberRouter = new Router();
 
+teamMemberRouter.post(
+    "/",
+    userMiddleware.authenticate,
+    teamMemberController.create
+);
+
 export { teamMemberRouter };

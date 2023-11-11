@@ -46,11 +46,12 @@ model User {
     updatedAt                        DateTime      @updatedAt
     tasks                            Tasks[]
 }
+
 model Company {
-    id String @id @default(auto()) @map("_id") @db.ObjectId
-    name String
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    name     String
     position String
-    userId String @unique @db.ObjectId
+    userId   String @unique @db.ObjectId
 }
 
 model Project {
