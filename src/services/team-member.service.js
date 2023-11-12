@@ -13,14 +13,39 @@ class TeamMemberService {
             data: {
                 ...input,
                 userId: userId,
-                inviteToken: hashedInviteToken,
-            },
+                inviteToken: hashedInviteToken
+            }
         });
 
         await mailer.sendCreatePasswordInviteToTeamMember(
             input.email,
             inviteToken
         );
+    };
+
+    createPassword = async (inviteToken, password) => {
+        const hashedInviteToken = crypto.hash(inviteToken);
+        const hashedPassword = await bcrypt.hash(password)
+
+        const user = await prisma.teamMember.findFirst({
+            where: {
+                inviteToken: hashedInviteToken
+            }
+        });
+        if (!user) {
+            throw new CustomError("Invalid Token", 400);
+        };
+
+        await prisma.teamMember.update({
+            where: {
+                inviteToken: hashedInviteToken
+            },
+            data: {
+                password: hashedPassword,
+                status: "ACTIVE",
+                inviteToken: null,
+            }
+        })
     };
 }
 
