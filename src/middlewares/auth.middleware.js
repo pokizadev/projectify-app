@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-class UserMiddleware {
+class AuthMiddleware {
     authenticate = (req, res, next) => {
         const { headers } = req;
         if (!headers.authorization) {
@@ -20,7 +20,7 @@ class UserMiddleware {
         try {
             const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-            req.userId = payload.userId;
+            req.adminId = payload.adminId;
             next();
         } catch (error) {
             res.status(500).json({
@@ -30,4 +30,4 @@ class UserMiddleware {
     };
 }
 
-export const userMiddleware = new UserMiddleware();
+export const authMiddleware = new AuthMiddleware();
