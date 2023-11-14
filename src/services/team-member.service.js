@@ -25,7 +25,7 @@ class TeamMemberService {
 
     createPassword = async (inviteToken, password, email) => {
         const hashedInviteToken = crypto.hash(inviteToken);
-        const hashedPassword = await bcrypt.hash(password)
+        const hashedPassword = await bcrypt.hash(password);
 
         const teamMember = await prisma.teamMember.findFirst({
             where: {
@@ -34,7 +34,7 @@ class TeamMemberService {
         });
         if (!teamMember) {
             throw new CustomError("Invalid Token", 400);
-        };
+        }
 
         await prisma.teamMember.update({
             where: {
@@ -44,15 +44,15 @@ class TeamMemberService {
             data: {
                 password: hashedPassword,
                 status: "ACTIVE",
-                inviteToken: null,
+                inviteToken: null
             }
-        })
+        });
     };
 
     getAll = async (adminId) => {
         const teamMembers = await prisma.teamMember.findMany({
             where: {
-                adminId: adminId,
+                adminId: adminId
             },
             select: {
                 id: true,
@@ -61,11 +61,34 @@ class TeamMemberService {
                 position: true,
                 createdAt: true
             }
-        })
+        });
         return teamMembers;
-    }
+    };
 
-    
+    changeStatus = async (adminId, teamMemberId, status) => {
+        const teamMember = await prisma.teamMember.findFirst({
+            where: {
+                adminId: adminId,
+                id: teamMemberId
+            }
+        });
+        if (!teamMemberId) {
+            throw new CustomError(
+                "Forbidden: Team member does not belong to your team",
+                403
+            );
+        }
+
+        await prisma.teamMember.update({
+            where: {
+                adminId: adminId,
+                id: teamMemberId
+            },
+            data: {
+                status: status
+            }
+        });
+    };
 }
 
 export const teamMemberService = new TeamMemberService();

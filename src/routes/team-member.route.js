@@ -10,6 +10,7 @@ teamMemberRouter.post(
     teamMemberController.create
 );
 teamMemberRouter.patch("/create-password", teamMemberController.createPassword);
-teamMemberRouter.get("/", authMiddleware.authenticate, teamMemberController.getAll)
+teamMemberRouter.get("/", authMiddleware.authenticate, teamMemberController.getAll);
+teamMemberRouter.patch("/:id/deactivate", authMiddleware.authenticate, teamMemberController.deactivate)
 
 export { teamMemberRouter };
