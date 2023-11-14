@@ -101,6 +101,23 @@ class ProjectService {
             }
         });
     };
+    isProjectBelongsToAdmin = async (id, adminId) => {
+        const project = await prisma.project.findUnique({
+            where: {
+                id
+            }
+        });
+
+        if (!project) {
+            throw new CustomError("Project does not exist", 404);
+        }
+        if (project.adminId !== adminId) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                404
+            );
+        }
+    };
 }
 
 export const projectService = new ProjectService();

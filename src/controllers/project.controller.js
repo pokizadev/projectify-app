@@ -113,6 +113,26 @@ class ProjectController {
 
         res.status(204).send();
     });
+
+    reactivateContributor = catchAsync(async (req, res) => {
+        const { adminId, body } = req;
+
+        if (!body.teamMemberId || !body.projectId) {
+            throw new CustomError(
+                "All fields are required: teamMemberId, projectId",
+                400
+            );
+        }
+
+        await projectService.changeContributorStatus(
+            body.projectId,
+            body.teamMemberId,
+            adminId,
+            "ACTIVE"
+        );
+
+        res.status(204).send();
+    });
 }
 
 export const projectController = new ProjectController();
