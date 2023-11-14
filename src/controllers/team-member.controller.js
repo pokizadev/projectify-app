@@ -52,6 +52,15 @@ class TeamMemberController {
             message:"You successfully created Password. Now, you can log in"
         })
     });
+
+    getAll = catchAsync(async(req, res) => {
+        const {adminId} = req;
+        const teamMembers = await teamMemberService.getAll(adminId);
+
+        res.status(200).json({
+            data: teamMembers
+        })
+    })
 }
 
 export const teamMemberController = new TeamMemberController();

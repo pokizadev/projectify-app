@@ -9,7 +9,7 @@ teamMemberRouter.post(
     authMiddleware.authenticate,
     teamMemberController.create
 );
-
-teamMemberRouter.patch("/create-password", teamMemberController.createPassword)
+teamMemberRouter.patch("/create-password", teamMemberController.createPassword);
+teamMemberRouter.get("/", authMiddleware.authenticate, teamMemberController.getAll)
 
 export { teamMemberRouter };
