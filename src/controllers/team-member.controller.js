@@ -13,7 +13,12 @@ class TeamMemberController {
             position: body.position
         };
 
-        if (!input.firstName || !input.lastName || !input.email || !input.position) {
+        if (
+            !input.firstName ||
+            !input.lastName ||
+            !input.email ||
+            !input.position
+        ) {
             throw new CustomError(
                 "All fields are required: First Name, Last Name, Email, Position",
                 400
@@ -29,15 +34,18 @@ class TeamMemberController {
     createPassword = catchAsync(async (req, res) => {
         const {
             query: { inviteToken },
-            body: { password, passwordConfirm, email } 
+            body: { password, passwordConfirm, email }
         } = req;
 
         if (!inviteToken) {
             throw new CustomError("Invite Token is missing", 400);
         }
 
-        if(!password || !passwordConfirm || !email) {
-            throw new CustomError("All fields are required: Password and Password Confirmation, Email", 400)
+        if (!password || !passwordConfirm || !email) {
+            throw new CustomError(
+                "All fields are required: Password and Password Confirmation, Email",
+                400
+            );
         }
 
         if (password !== passwordConfirm) {
@@ -49,8 +57,41 @@ class TeamMemberController {
         await teamMemberService.createPassword(inviteToken, password, email);
 
         res.status(200).json({
-            message:"You successfully created Password. Now, you can log in"
-        })
+            message: "You successfully created Password. Now, you can log in"
+        });
+    });
+
+    getAll = catchAsync(async (req, res) => {
+        const { adminId } = req;
+        const teamMembers = await teamMemberService.getAll(adminId);
+
+        res.status(200).json({
+            data: teamMembers
+        });
+    });
+
+    deactivate = catchAsync(async (req, res) => {
+        const { body, adminId, params } = req;
+        if (!body.teamMemberId || !params.id) {
+            throw new CustomError("All fields are required", 400);
+        }
+        await teamMemberService.changeStatus(
+            adminId,
+            params.id,
+            body.teamMemberId
+        );
+        res.status(204).send();
+    });
+
+    reactivate = catchAsync(async (req, res) => {
+        const { adminId, body } = req;
+        await teamMemberService.changeStatus(
+            adminId,
+            body.teamMemberId,
+            "ACTIVE"
+        );
+
+        res.status(204).send();
     });
 }
 
