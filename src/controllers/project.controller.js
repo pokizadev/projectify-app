@@ -93,6 +93,26 @@ class ProjectController {
             message: `Team member with ${body.teamMemberId} id was added to project with ${body.projectId} id`
         });
     });
+
+    deactivateContributor = catchAsync(async (req, res) => {
+        const { adminId, body } = req;
+
+        if (!body.teamMemberId || !body.projectId) {
+            throw new CustomError(
+                "All fields are required: teamMemberId, projectId",
+                400
+            );
+        }
+
+        await projectService.changeContributorStatus(
+            body.projectId,
+            body.teamMemberId,
+            adminId,
+            "INACTIVE"
+        );
+
+        res.status(204).send();
+    });
 }
 
 export const projectController = new ProjectController();

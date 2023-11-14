@@ -6,8 +6,8 @@ class ProjectService {
         const project = await prisma.project.create({
             data: {
                 ...input,
-                adminId: adminId,
-            },
+                adminId: adminId
+            }
         });
 
         return project;
@@ -16,8 +16,8 @@ class ProjectService {
     getOne = async (id, adminId) => {
         const project = await prisma.project.findUnique({
             where: {
-                id: id,
-            },
+                id: id
+            }
         });
 
         if (!project) {
@@ -38,19 +38,19 @@ class ProjectService {
         await prisma.project.update({
             where: {
                 id: id,
-                adminId: adminId,
+                adminId: adminId
             },
             data: {
-                ...update,
-            },
+                ...update
+            }
         });
     };
 
     getAll = async (adminId) => {
         const projects = await prisma.project.findMany({
             where: {
-                adminId: adminId,
-            },
+                adminId: adminId
+            }
         });
 
         return projects;
@@ -60,12 +60,12 @@ class ProjectService {
         await prisma.project.update({
             where: {
                 id: id,
-                adminId: adminId,
+                adminId: adminId
             },
 
             data: {
-                status: status,
-            },
+                status: status
+            }
         });
     };
 
@@ -76,10 +76,31 @@ class ProjectService {
             adminId
         );
         await prisma.teamMemberProject.create({
-            data: { projectId, teamMemberId },
+            data: { projectId, teamMemberId }
         });
     };
 
+    changeContributorStatus = async (
+        projectId,
+        teamMemberId,
+        adminId,
+        status
+    ) => {
+        await this.isProjectBelongsToAdmin(projectId, adminId);
+        await teamMemberService.isTeamMemberBelongsToAdmin(
+            teamMemberId,
+            adminId
+        );
+        await prisma.teamMemberProject.updateMany({
+            where: {
+                projectId,
+                teamMemberId
+            },
+            data: {
+                status
+            }
+        });
+    };
 }
 
 export const projectService = new ProjectService();
