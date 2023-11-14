@@ -24,7 +24,7 @@ class Mailer {
         try {
             await this.send({
                 to: emailAddress,
-                subject: "Activate Your Account",
+                subject: "Projectify App | Activate Your Account",
                 html: `<a href="http://localhost:3000/admins/activate?activationToken=${token}">Verify your email</a> `
             });
         } catch (error) {

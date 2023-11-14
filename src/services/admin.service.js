@@ -190,25 +190,25 @@ class AdminService {
                 lastName: true,
                 preferredFirstName: true,
                 email: true,
-                id: true,
+                id: true
             }
         });
 
         if (!admin) {
-            throw new CustomError("admin not found", 404);
+            throw new CustomError("Admin not found", 404);
         }
 
         const company = await prisma.company.findFirst({
             where: {
-               adminId: admin.id
+                adminId: admin.id
             },
             select: {
                 name: true,
                 position: true
             }
-        })
+        });
 
-        return { ...admin, company};
+        return { ...admin, company };
     };
 
     createTask = async (adminId, input) => {
@@ -325,5 +325,4 @@ class AdminService {
     };
 }
 
-export const adminService = new 
-AdminService();
+export const adminService = new AdminService();

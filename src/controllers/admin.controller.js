@@ -1,7 +1,6 @@
-import { adminService } from "../services/admin.services.js";
-import jwt from "jsonwebtoken";
+import { adminService } from "../services/admin.service.js";
 import { catchAsync } from "../utils/catch-async.js";
-import {CustomError} from "../utils/custom-error.js"
+import { CustomError } from "../utils/custom-error.js";
 
 class AdminController {
     signUp = catchAsync(async (req, res) => {
@@ -9,7 +8,7 @@ class AdminController {
 
         const adminInput = {
             email: body.email,
-            preferredFirstName: body.preferredName,
+            preferredFirstName: body.preferredFirstName,
             firstName: body.firstName,
             lastName: body.lastName,
             password: body.password
@@ -17,7 +16,7 @@ class AdminController {
         const companyInput = {
             name: body.company.name,
             position: body.company.position
-        }
+        };
         await adminService.signUp(adminInput, companyInput);
         res.status(201).json({
             message: "Success"
@@ -41,7 +40,7 @@ class AdminController {
         } = req;
 
         if (!activationToken) {
-           throw new CustomError("Activation Token is missing", 400)
+            throw new CustomError("Activation Token is missing", 400);
         }
         await adminService.activate(activationToken);
 
@@ -67,18 +66,23 @@ class AdminController {
             headers
         } = req;
         if (!password || !passwordConfirm) {
-           throw new CustomError("Both Password and Password Confirmation are required")
+            throw new CustomError(
+                "Both Password and Password Confirmation are required"
+            );
         }
 
         if (password !== passwordConfirm) {
-            throw new CustomError("Password and Password Confirmation does not match", 400)
+            throw new CustomError(
+                "Password and Password Confirmation does not match",
+                400
+            );
         }
         if (!headers.authorization) {
-           throw new CustomError("Password Reset Token is missing"), 400
+            throw (new CustomError("Password Reset Token is missing"), 400);
         }
         const [bearer, token] = headers.authorization.split(" ");
         if (bearer !== "Bearer" || !token) {
-            throw new CustomError("Invalid Password Reset Token", 400)
+            throw new CustomError("Invalid Password Reset Token", 400);
         }
 
         await adminService.resetPassword(token, password);
@@ -113,7 +117,7 @@ class AdminController {
         };
 
         if (!input.title || !input.due) {
-            throw new CustomError(" Both Title or Due date are required")
+            throw new CustomError(" Both Title or Due date are required");
         }
 
         const data = await adminService.createTask(adminId, input);
@@ -148,7 +152,7 @@ class AdminController {
             input.description = body.description;
         }
         if (!Object.keys(input).length) {
-            throw new CustomError("Update data is required", 400)
+            throw new CustomError("Update data is required", 400);
         }
 
         await adminService.updateTask(adminId, params.taskId, input);
