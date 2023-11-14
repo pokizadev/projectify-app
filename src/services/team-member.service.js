@@ -72,7 +72,7 @@ class TeamMemberService {
                 id: teamMemberId
             }
         });
-        if (!teamMemberId) {
+        if (!teamMember) {
             throw new CustomError(
                 "Forbidden: Team member does not belong to your team",
                 403
@@ -88,6 +88,24 @@ class TeamMemberService {
                 status: status
             }
         });
+    };
+    isTeamMemberBelongsToAdmin = async (id, adminId) => {
+        const teamMember = await prisma.teamMember.findUnique({
+            where: {
+                id,
+            },
+        });
+
+        if (!teamMember) {
+            throw new CustomError("Team member does not exist", 404);
+        }
+
+        if (teamMember.adminId !== adminId) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                403
+            );
+        }
     };
 }
 
