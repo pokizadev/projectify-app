@@ -7,25 +7,27 @@ export class GlobalError {
         let message = err.message;
         let isOperational = false;
 
-        if(err.isOperational) {
+        if (err.isOperational) {
             statusCode = err.statusCode;
             isOperational = true;
         }
 
-        if(err instanceof PrismaClientKnownRequestError) {
-            if(err.code === "P2002") {
+        if (err instanceof PrismaClientKnownRequestError) {
+            if (err.code === "P2002") {
                 statusCode = 409;
                 message = "Resource already exists";
-                isOperational = true
+                isOperational = true;
             }
         }
+
+        console.log("I am error");
 
         res.status(statusCode).json({
             message,
             isOperational,
             success
         });
-        next();
+        // next();
 
         // or
         // if(err.isOperational) {
