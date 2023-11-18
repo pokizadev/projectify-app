@@ -3,6 +3,7 @@ import { crypto } from "../utils/crypto.js";
 import { mailer } from "../utils/mailer.js";
 import { CustomError } from "../utils/custom-error.js";
 import { bcrypt } from "../utils/bcrypt.js";
+import jwt from "jsonwebtoken";
 
 class TeamMemberService {
     create = async (adminId, input) => {
@@ -92,8 +93,8 @@ class TeamMemberService {
     isTeamMemberBelongsToAdmin = async (id, adminId) => {
         const teamMember = await prisma.teamMember.findUnique({
             where: {
-                id,
-            },
+                id
+            }
         });
 
         if (!teamMember) {
@@ -106,6 +107,81 @@ class TeamMemberService {
                 403
             );
         }
+    };
+
+    login = async (email, password) => {
+        const teamMember = await prisma.teamMember.findUnique({
+            where: {
+                email: email
+            },
+            select: {
+                id: true,
+                status: true,
+                password: true
+            }
+        });
+        if (!teamMember) throw new CustomError("User does not exist", 404);
+
+        if (teamMember.status === "INACTIVE" && !teamMember.password) {
+            const inviteToken = crypto.createToken();
+            const hashedInviteToken = crypto.hash(inviteToken);
+
+            await prisma.teamMember.update({
+                where: {
+                    email: email
+                },
+                data: {
+                    inviteToken: hashedInviteToken
+                }
+            });
+            await mailer.sendCreatePasswordInviteToTeamMember(
+                email,
+                inviteToken
+            );
+
+            throw new CustomError(
+                "You did not set up the password yet. We just emailed an instruction.",
+                400
+            );
+        }
+
+        if (teamMember.status === "INACTIVE" && teamMember.password) {
+            "Your account has INACTIVE status, can not log in", 400;
+        }
+
+        const isPasswordMatches = await bcrypt.compare(
+            password,
+            teamMember.password
+        );
+        if (!isPasswordMatches) {
+            console.log("jhsfghwfhgvdghvfhgdvfghvdhfvhgewvghwe");
+            throw new CustomError("Invalid Credentials", 401);
+        }
+        const projects = await prisma.teamMemberProject.findMany({
+            where: {
+                teamMemberId: teamMember.id,
+                status: "ACTIVE"
+            },
+            select: {
+                projectId: true
+            }
+        });
+        const projectIds = projects.map((project) => project.projectId);
+
+        const token = jwt.sign(
+            {
+                teamMember: {
+                    id: teamMember.id,
+                    adminId: teamMember.adminId,
+                    projects
+                }
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "2days"
+            }
+        );
+        return token;
     };
 }
 
