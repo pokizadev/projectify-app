@@ -25,7 +25,7 @@ class Mailer {
             await this.send({
                 to: emailAddress,
                 subject: "Projectify App | Activate Your Account",
-                html: `<a href="http://localhost:3000/admins/activate?activationToken=${token}">Verify your email</a> `
+                html: `<a href="http://localhost:4000/admins/activate?activationToken=${token}">Verify your email</a> `
             });
         } catch (error) {
             throw error;
@@ -36,7 +36,7 @@ class Mailer {
             this.send({
                 to: emailAddress,
                 subject: "Projectify App | Reset Password",
-                html: `<a href="http://localhost:4000/reset-password/passwordResetToken=${token}">Reset Your Password</a>`
+                html: `<a href="http://localhost:6000/reset-password/passwordResetToken=${token}">Reset Your Password</a>`
             });
         } catch (error) {
             throw error;

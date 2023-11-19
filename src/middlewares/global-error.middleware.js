@@ -19,9 +19,6 @@ export class GlobalError {
                 isOperational = true;
             }
         }
-
-        console.log("I am error");
-
         res.status(statusCode).json({
             message,
             isOperational,
