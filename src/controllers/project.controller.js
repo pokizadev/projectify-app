@@ -84,9 +84,10 @@ class ProjectController {
         }
 
         await projectService.addContributor(
+            adminId,
             body.projectId,
             body.teamMemberId,
-            adminId
+            
         );
 
         res.status(200).json({

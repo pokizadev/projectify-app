@@ -29,4 +29,8 @@ projectRouter.patch(
     projectController.reactivate
 );
 
+projectRouter.post("/add-contributor", authMiddleware.authenticate, projectController.addContributor);
+
+projectRouter.patch("/deactivate-contributor", authMiddleware.authenticate, projectController.deactivateContributor)
+
 export { projectRouter };

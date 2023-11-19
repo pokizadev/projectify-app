@@ -69,12 +69,12 @@ class ProjectService {
         });
     };
 
-    addContributor = async (projectId, teamMemberId, adminId) => {
-        await this.isProjectBelongsToAdmin(projectId, adminId);
-        await teamMemberService.isTeamMemberBelongsToAdmin(
-            teamMemberId,
-            adminId
-        );
+    addContributor = async (adminId, projectId, teamMemberId, ) => {
+        // await this.isProjectBelongsToAdmin(projectId, adminId);
+        // await teamMemberService.isTeamMemberBelongsToAdmin(
+        //     teamMemberId,
+        //     adminId
+        // );
         await prisma.teamMemberProject.create({
             data: { projectId, teamMemberId }
         });
