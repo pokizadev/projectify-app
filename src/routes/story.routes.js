@@ -1,5 +1,13 @@
 import { Router } from "express";
-
+import { authMiddleware } from "../middlewares/auth.middleware";
+import { storyController } from "../controllers/story.controller";
 const storyRouter = Router();
 
-export { storyRouter }
+storyRouter.post(
+    "/",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    storyController.create
+);
+
+export { storyRouter };

@@ -1,5 +1,15 @@
 import { prisma } from "../prisma/index.js";
+import {projectService} from "../services/project.service.js"
 
-class StoryService {}
+class StoryService {
+    create = async (input, adminId) => {
+        await projectService.isProjectBelongsToAdmin(input.projectId, adminId)
+
+        const story = await prisma.story.create({
+            data: input
+        });
+        return story;
+    }
+}
 
 export const storyService = new StoryService();

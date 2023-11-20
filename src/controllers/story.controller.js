@@ -1,5 +1,39 @@
 import { storyService } from "../services/story.service.js";
+import { catchAsync } from "../utils/catch-async.js";
+import { CustomError } from "../utils/custom-error.js";
 
-class StoryController {}
+class StoryController {
+    create = catchAsync(async (req, res) => {
+        const {
+            body: {
+                title,
+                description,
+                point,
+                due,
+                asigneeId,
+                projectId,
+                adminId
+            }
+        } = req;
+
+        if (!title || !projectId) {
+            throw new CustomError("title and projectId are requierd", 400);
+        }
+
+        const input = {
+            title,
+            description,
+            point,
+            due,
+            asigneeId,
+            projectId
+        };
+
+        const story = await storyService.create(input, adminId);
+        res.status(200).json({
+            data: story
+        })
+    });
+}
 
 export const storyController = new StoryController();
