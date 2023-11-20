@@ -1,5 +1,6 @@
 import { prisma } from "../prisma/index.js";
 import { CustomError } from "../utils/custom-error.js";
+import {teamMemberService} from "./team-member.service.js"
 
 class ProjectService {
     create = async (input, adminId) => {
@@ -69,7 +70,7 @@ class ProjectService {
         });
     };
 
-    addContributor = async (projectId, teamMemberId, adminId) => {
+    addContributor = async (projectId, teamMemberId,adminId) => {
         await this.isProjectBelongsToAdmin(projectId, adminId);
         await teamMemberService.isTeamMemberBelongsToAdmin(
             teamMemberId,
