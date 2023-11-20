@@ -154,7 +154,6 @@ class TeamMemberService {
             teamMember.password
         );
         if (!isPasswordMatches) {
-            console.log("jhsfghwfhgvdghvfhgdvfghvdhfvhgewvghwe");
             throw new CustomError("Invalid Credentials", 401);
         }
         const projects = await prisma.teamMemberProject.findMany({
@@ -183,6 +182,8 @@ class TeamMemberService {
         );
         return token;
     };
+
+
 }
 
 export const teamMemberService = new TeamMemberService();
