@@ -19,7 +19,7 @@ teamMemberRouter.get(
 );
 
 teamMemberRouter.patch(
-    "/:id/deactivate",
+    "/deactivate",
     authMiddleware.authenticate,
     teamMemberController.deactivate
 );
@@ -28,5 +28,7 @@ teamMemberRouter.patch(
     authMiddleware.authenticate,
     teamMemberController.reactivate
 );
+
+teamMemberRouter.post("/login",  teamMemberController.login)
 
 export { teamMemberRouter };
