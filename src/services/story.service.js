@@ -1,5 +1,6 @@
 import { prisma } from "../prisma/index.js";
 import { projectService } from "../services/project.service.js";
+import { CustomError } from "../utils/custom-error.js";
 
 class StoryService {
     create = async (input, adminId) => {
@@ -11,7 +12,7 @@ class StoryService {
         return story;
     };
     
-    getOne = async (id, projectId) => {
+    getOne = async (adminId, id) => {
         const story = await prisma.story.findUnique({
             where: {
                 id: id
@@ -22,7 +23,7 @@ class StoryService {
             throw new CustomError("Story does not exist", 404);
         }
 
-        if (story.projectId !== projectId) {
+        if (story.adminId !== story.projectId.adminId) {
             throw new CustomError(
                 "Forbidden: This story does not belong to you!",
                 403

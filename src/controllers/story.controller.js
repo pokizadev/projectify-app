@@ -5,19 +5,15 @@ import { CustomError } from "../utils/custom-error.js";
 class StoryController {
     create = catchAsync(async (req, res) => {
         const {
-            body: {
-                title,
-                description,
-                point,
-                due,
-                asigneeId,
-                projectId,
-                adminId
-            }
+            body: { title, description, point, due, asigneeId, projectId },
+            adminId
         } = req;
 
         if (!title || !projectId) {
-            throw new CustomError("title and projectId are requierd", 400);
+            throw new CustomError(
+                "All fields are required: Title, Description and Due date!",
+                400
+            );
         }
 
         const input = {
@@ -36,9 +32,9 @@ class StoryController {
     });
 
     getOne = catchAsync(async (req, res) => {
-        const { projectId, params } = req;
+        const { adminId, params } = req;
 
-        const story = await storyService.getOne(params.id, projectId);
+        const story = await storyService.getOne(adminId, params.id);
 
         res.status(200).json({
             data: story
