@@ -11,8 +11,8 @@ class StoryService {
         });
         return story;
     };
-    
-    getOne = async (adminId, id) => {
+
+    getOne = async (id) => {
         const story = await prisma.story.findUnique({
             where: {
                 id: id
@@ -31,6 +31,32 @@ class StoryService {
         }
 
         return story;
+    };
+
+    getAll = async (adminId, projectId) => {
+        const stories = await prisma.story.findMany({
+            where: {
+                adminId: adminId,
+                projectId: projectId
+            }
+            // select: {
+            //     id: true,
+            //     title: true,
+            //     description: true,
+            //     status: true,
+            //     point: true,
+            //     due: true
+            // }
+        });
+
+        if (!projectId) {
+            throw new CustomError("Please Provide Project Id", 400);
+        }
+
+        if (adminId !== projectId.adminId) {
+            throw new CustomError("Project does not Belong to you");
+        }
+        return stories;
     };
 }
 

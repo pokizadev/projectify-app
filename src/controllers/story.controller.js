@@ -32,14 +32,25 @@ class StoryController {
     });
 
     getOne = catchAsync(async (req, res) => {
-        const { adminId, params } = req;
+        const { params } = req;
 
-        const story = await storyService.getOne(adminId, params.id);
+        const story = await storyService.getOne(params.id);
 
         res.status(200).json({
             data: story
         });
     });
+
+    getAll = catchAsync(async(req, res) => {
+        const {adminId, body} = req;
+
+        const stories = await storyService.getAll(adminId, body.projectId);
+
+        res.status(200).json({
+            data: stories
+        })
+
+    })
 }
 
 export const storyController = new StoryController();
