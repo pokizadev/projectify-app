@@ -32,7 +32,17 @@ class StoryController {
         const story = await storyService.create(input, adminId);
         res.status(200).json({
             data: story
-        })
+        });
+    });
+
+    getOne = catchAsync(async (req, res) => {
+        const { projectId, params } = req;
+
+        const story = await storyService.getOne(params.id, projectId);
+
+        res.status(200).json({
+            data: story
+        });
     });
 }
 
