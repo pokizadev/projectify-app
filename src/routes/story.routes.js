@@ -17,6 +17,4 @@ storyRouter.get(
     storyController.getOne
 );
 
-storyRouter.get("/", authMiddleware.authenticate, authMiddleware.isAdmin, storyController.getAll)
-
 export { storyRouter };

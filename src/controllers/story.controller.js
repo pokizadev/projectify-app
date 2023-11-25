@@ -41,16 +41,6 @@ class StoryController {
         });
     });
 
-    getAll = catchAsync(async(req, res) => {
-        const {adminId, body} = req;
-
-        const stories = await storyService.getAll(adminId, body.projectId);
-
-        res.status(200).json({
-            data: stories
-        })
-
-    })
 }
 
 export const storyController = new StoryController();
