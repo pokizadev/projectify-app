@@ -101,11 +101,15 @@ class TeamMemberController {
             throw new CustomError ("All fields required: name and password", 400);
         }
 
-        const jwt = await teamMemberService.login(email, password);
-
+        const { token, projectIds, me } = await teamMemberService.login(
+            email,
+            password
+        );
         res.status(200).json({
-            token: jwt
-        })
+            token,
+            projectIds,
+            me,
+        });
          
     });
 }

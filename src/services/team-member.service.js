@@ -117,7 +117,10 @@ class TeamMemberService {
             select: {
                 id: true,
                 status: true,
-                password: true
+                password: true,
+                adminId: true,
+                firstName: true,
+                lastName: true
             }
         });
         if (!teamMember) throw new CustomError("User does not exist", 404);
@@ -171,8 +174,7 @@ class TeamMemberService {
             {
                 teamMember: {
                     id: teamMember.id,
-                    adminId: teamMember.adminId,
-                    projects
+                    adminId: teamMember.adminId
                 }
             },
             process.env.JWT_SECRET,
@@ -180,10 +182,12 @@ class TeamMemberService {
                 expiresIn: "2days"
             }
         );
-        return token;
+        const teamMemberWithoutPassword = {
+            firstName: teamMember.firstName,
+            lastName: teamMember.lastName
+        };
+        return { token, projectIds, me: teamMemberWithoutPassword };
     };
-
-
 }
 
 export const teamMemberService = new TeamMemberService();
