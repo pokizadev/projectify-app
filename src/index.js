@@ -15,6 +15,7 @@ app.use(cors())
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
+console.log(process.env.NODE_ENV)
 
 app.use("/admins", adminRouter);
 app.use("/projects", projectRouter);
