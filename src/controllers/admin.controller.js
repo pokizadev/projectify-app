@@ -19,7 +19,7 @@ class AdminController {
         };
         await adminService.signUp(adminInput, companyInput);
         res.status(201).json({
-            message: "Success"
+            message:  "We have just sent you an email. Please,  Activate your account."
         });
     });
 
@@ -56,7 +56,7 @@ class AdminController {
 
         await adminService.forgotPassword(email);
         res.status(200).json({
-            message: "Password reset email has been sent"
+            message: "We emailed you an instruction to reset your password. Follow it!"
         });
     });
 

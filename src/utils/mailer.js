@@ -11,6 +11,11 @@ class Mailer {
                 pass: process.env.MAILER_PASS
             }
         });
+        this.baseApiURL =
+            process.env.NODE_ENV === "local"
+                ? "http://localhost:4000"
+                : "https://projectify-app-api.onrender.com";
+        this.baseUiURL = process.env.UI_BASE_URL;
     }
     send = async (mailOptions) => {
         try {
@@ -25,7 +30,7 @@ class Mailer {
             await this.send({
                 to: emailAddress,
                 subject: "Projectify App | Activate Your Account",
-                html: `<a href="http://localhost:4000/admins/activate?activationToken=${token}">Verify your email</a> `
+                html: `<a href="http://localhost:3000/admins/activate?activationToken=${token}">Verify your email</a> `
             });
         } catch (error) {
             throw error;
