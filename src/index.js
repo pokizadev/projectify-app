@@ -1,13 +1,13 @@
 import express from "express";
 import dotenv from "dotenv";
 import { GlobalError } from "./middlewares/global-error.middleware.js";
-
+import cors from "cors"
 // import cookieParser from "cookie-parser";
 import { adminRouter } from "./routes/admin.route.js";
 import { projectRouter } from "./routes/project.route.js";
 import { teamMemberRouter } from "./routes/team-member.route.js";
 import { storyRouter } from "./routes/story.routes.js";
-import cors from "cors"
+
 
 dotenv.config();
 

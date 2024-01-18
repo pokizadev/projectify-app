@@ -20,6 +20,7 @@
     },
     "homepage": "https://github.com/PokizaSdv/projectify-app#readme",
     "devDependencies": {
+        "nodemon": "^3.0.3",
         "prisma": "^5.4.1"
     },
     "dependencies": {
