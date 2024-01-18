@@ -17,6 +17,11 @@ class AdminController {
             name: body.company.name,
             position: body.company.position
         };
+
+        if(body.company) {
+            companyInput.name = body.company.name;
+            companyInput.position = body.company.position;
+        }
         await adminService.signUp(adminInput, companyInput);
         res.status(201).json({
             message:  "We have just sent you an email. Please,  Activate your account."
