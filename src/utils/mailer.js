@@ -13,8 +13,8 @@ class Mailer {
         });
         this.baseApiURL =
             process.env.NODE_ENV === "local"
-                ? "http://localhost:3000"
-                : "https://projectify-app-api.onrender.com";
+                ? "http://localhost:4000"
+                : "https://projectify-app-api-l1pv.onrender.com";
         this.baseUiURL = process.env.UI_BASE_URL;
     }
     send = async (mailOptions) => {
