@@ -30,7 +30,7 @@ class Mailer {
             await this.send({
                 to: emailAddress,
                 subject: "Projectify App | Activate Your Account",
-                html: `<a href="http://localhost:3000/admins/activate?activationToken=${token}">Verify your email</a> `
+                html: `<a href="${this.baseApiURL}/admins/activate?activationToken=${token}">Verify your email</a> `
             });
         } catch (error) {
             throw error;
@@ -41,7 +41,7 @@ class Mailer {
             this.send({
                 to: emailAddress,
                 subject: "Projectify App | Reset Password",
-                html: `<a href="http://localhost:6000/reset-password/passwordResetToken=${token}">Reset Your Password</a>`
+                html: `<a href="${this.baseUiURL}/admin/reset-password?passwordResetToken=${token}">Reset Your Password</a>`
             });
         } catch (error) {
             throw error;
@@ -53,7 +53,7 @@ class Mailer {
             await this.send({
                 to: emailAddress,
                 subject: "Pojectify App | Welcome to the team",
-                html: `<a href="http://localhost:4000/team-member/create-password?inviteToken=${token}">Click to Create a Password</a>`
+                html: `<a href="${this.baseUiURL}/team-member/create-password?inviteToken=${token}">Click to Create a Password</a>`
             });
         } catch (error) {
             throw error;
