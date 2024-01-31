@@ -39,7 +39,7 @@ class TeamMemberService {
 
         await prisma.teamMember.update({
             where: {
-                email: email,
+                email: email.toLowerCase(),
                 inviteToken: hashedInviteToken
             },
             data: {
@@ -112,7 +112,7 @@ class TeamMemberService {
     login = async (email, password) => {
         const teamMember = await prisma.teamMember.findUnique({
             where: {
-                email: email
+                email: email.toLowerCase()
             },
             select: {
                 id: true,

@@ -40,7 +40,7 @@ class AdminService {
     login = async (input) => {
         const admin = await prisma.admin.findFirst({
             where: {
-                email: input.email
+                email: input.email.toLowerCase()
             },
             select: {
                 id: true,
@@ -81,7 +81,8 @@ class AdminService {
         }
         const token = jwt.sign(
             {
-                adminId: admin.id
+                adminId: admin.id,
+                role: "admin"
             },
             process.env.JWT_SECRET,
             {
@@ -213,7 +214,7 @@ class AdminService {
             }
         });
 
-        return { ...admin, company };
+        return { ...admin, company, role: "admin" };
     };
 
     createTask = async (adminId, input) => {
