@@ -7,9 +7,15 @@ generator client {
     provider = "prisma-client-js"
 }
 
-enum AccountStatus {
+enum AdminAccountStatus {
     ACTIVE
     INACTIVE
+}
+
+enum TeamMemberAccountStatus {
+    ACTIVE
+    INACTIVE
+    DEACTIVATED
 }
 
 enum ProjectStatus {
@@ -57,7 +63,7 @@ model Admin {
     firstName                        String
     lastName                         String
     password                         String
-    status                           AccountStatus @default(INACTIVE)
+    status                           AdminAccountStatus @default(INACTIVE)
     activationToken                  String?
     passwordResetToken               String?
     passwordResetTokenExpirationDate DateTime?
@@ -83,7 +89,7 @@ model TeamMember {
     position    String
     email       String        @unique
     password    String?
-    status      AccountStatus @default(INACTIVE)
+    status      TeamMemberAccountStatus @default(INACTIVE)
     adminId     String        @db.ObjectId
     inviteToken String?
     createdAt   DateTime      @default(now())
@@ -113,4 +119,4 @@ model Story {
     point       Int?
     due         DateTime?
     assigneeId  String?     @db.ObjectId
-}
+} 

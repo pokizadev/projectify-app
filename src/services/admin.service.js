@@ -104,7 +104,7 @@ class AdminService {
         });
 
         if (!admin) {
-            throw new CustomError("Invalid Token", 404);
+            throw new CustomError("Admin does not exist with provided Activation Tiken", 404);
         }
 
         await prisma.admin.update({
@@ -201,7 +201,7 @@ class AdminService {
         });
 
         if (!admin) {
-            throw new CustomError("Admin not found", 404);
+            throw new CustomError("Admin does not exist", 404);
         }
 
         const company = await prisma.company.findFirst({

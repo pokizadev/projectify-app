@@ -85,7 +85,7 @@ class TeamMemberController {
         await teamMemberService.changeStatus(
             adminId,
             body.teamMemberId,
-            "INACTIVE"
+            "DEACTIVATED"
         );
         res.status(204).send();
     });
@@ -110,14 +110,9 @@ class TeamMemberController {
             throw new CustomError ("All fields required: name and password", 400);
         }
 
-        const { token, projectIds, me } = await teamMemberService.login(
-            email,
-            password
-        );
+        const jwt = await teamMemberService.login(email, password)
         res.status(200).json({
-            token,
-            projectIds,
-            me,
+            token: jwt
         });
          
     });
@@ -126,7 +121,7 @@ class TeamMemberController {
         const { teamMember } = req;
         const me = await teamMemberService.getMe(teamMember.id);
 
-        req.status(200).json({
+        res.status(200).json({
             data: me,
         });
     });
