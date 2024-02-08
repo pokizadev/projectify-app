@@ -134,7 +134,15 @@ class AdminController {
     getTasks = catchAsync(async (req, res) => {
         const { adminId } = req;
 
+        if (!adminId) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                403
+            );
+        }
+
         const tasks = await adminService.getTasks(adminId);
+
         res.status(200).json({ data: tasks });
     });
 
@@ -142,6 +150,7 @@ class AdminController {
         const { adminId, params } = req;
 
         const task = await adminService.getTask(adminId, params.taskId);
+        
         res.status(200).json({ data: task });
     });
 

@@ -219,7 +219,7 @@ class AdminService {
 
     createTask = async (adminId, input) => {
         const id = uuid();
-        const finalInput = {
+        const task = {
             ...input,
             status: "TODO",
             id
@@ -231,11 +231,11 @@ class AdminService {
             },
             data: {
                 tasks: {
-                    push: finalInput
+                    push: task
                 }
             }
         });
-        return finalInput;
+        return task;
     };
 
     getTasks = async (adminId) => {
