@@ -210,6 +210,110 @@ class TeamMemberService {
 
         return { ...teamMember, role: "teamMember" };
     };
+
+    forgotPassword = async (email) => {
+        const teamMember = await prisma.teamMember.findFirst({
+            where: {
+                email
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (!teamMember) {
+            throw new CustomError(
+                "Team member does not exist with provided email",
+                404
+            );
+        }
+
+        const passwordResetToken = crypto.createToken();
+        const hashedPasswordResetToken = crypto.hash(passwordResetToken);
+
+        await prisma.teamMember.update({
+            where: {
+                id: teamMember.id
+            },
+            data: {
+                passwordResetToken: hashedPasswordResetToken,
+                passwordResetTokenExpirationDate: date.addMinutes(10)
+            }
+        });
+
+        await mailer.sendPasswordResetToken(email, passwordResetToken);
+    };
+
+    resetPassword = async (token, password) => {
+        const hashedPasswordResetToken = crypto.hash(token);
+        const teamMember = await prisma.teamMember.findFirst({
+            where: {
+                passwordResetToken: hashedPasswordResetToken
+            },
+            select: {
+                id: true,
+                passwordResetToken: true,
+                passwordResetTokenExpirationDate: true
+            }
+        });
+
+        if (!teamMember) {
+            throw new CustomError("Invalid Token", 404);
+        }
+
+        const currentTime = new Date();
+        const tokenExpDate = new Date(admin.passwordResetTokenExpirationDate);
+
+        if (tokenExpDate < currentTime) {
+            // Token Expired;
+            throw new CustomError("Password Reset Token Expired");
+        }
+
+        await prisma.teamMember.update({
+            where: {
+                id: teamMember.id
+            },
+            data: {
+                password: await bcrypt.hash(password),
+                passwordResetToken: null,
+                passwordResetTokenExpirationDate: null
+            }
+        });
+    };
+
+    changePassword = async (teamMemberId, input) => {
+        const teamMember = await prisma.teamMember.findUnique({
+            where: {
+                id: teamMemberId
+            },
+            select: {
+                password: true
+            }
+        })
+
+        if (!teamMember) {
+            throw new CustomError("Team member does not exist", 404);
+        }
+
+        const hashedPassword = await bcrypt.hash(input.newPassword)
+        const passwordMatch = await bcrypt.compare(
+            hashedPassword,
+            teamMember.password
+        );
+
+        if (!passwordMatch) {
+            throw new CustomError("Invalid Credentials", 400);
+        }
+
+        await prisma.teamMember.update({
+            where: {
+                id: teamMemberId
+            },
+            data: {
+                password: hashedPassword
+            }
+        });
+    }
 }
 
 export const teamMemberService = new TeamMemberService();

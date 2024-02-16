@@ -125,6 +125,92 @@ class TeamMemberController {
             data: me,
         });
     });
+
+    forgotPassword = catchAsync(async(req, res) => {
+        const {
+            body: {email}
+        } = req;
+    
+        await teamMemberService.forgotPassword(email);
+            res.status(200).json({
+                message: "We emailed you an instruction to reset your password. Follow it!"
+            });
+    })
+
+    resetPassword = catchAsync(async (req, res) => {
+        const {
+            body: { password, passwordConfirm },
+            headers
+        } = req;
+        if (!password || !passwordConfirm) {
+            throw new CustomError(
+                "Both Password and Password Confirmation are required"
+            );
+        }
+
+        if (password !== passwordConfirm) {
+            throw new CustomError(
+                "Password and Password Confirmation does not match",
+                400
+            );
+        }
+        if (!headers.authorization) {
+            throw (new CustomError("Password Reset Token is missing"), 400);
+        }
+        const [bearer, token] = headers.authorization.split(" ");
+        if (bearer !== "Bearer" || !token) {
+            throw new CustomError("Invalid Password Reset Token", 400);
+        }
+
+        await teamMemberService.resetPassword(token, password);
+        res.status(200).json({
+            message: "Password successfully updated"
+        });
+    });
+
+    changePassword = catchAsync(async (req, res) => {
+        const { teamMember, body } = req;
+
+        const input = {
+            password: body.password,
+            newPassword: body.newPassword,
+            newPasswordConfirm: body.newPasswordConfirm
+        };
+
+        if (
+            !input.password ||
+            !input.newPassword ||
+            !input.newPasswordConfirm
+        ) {
+            "All fields are required: Current Password and New Password, New Password Confirmation",
+                400;
+        }
+
+        if (input.password === input.newPassword) {
+            throw new CustomError(
+                "Current Password and New password must not match!",
+                400
+            );
+        }
+
+        if (input.newPassword !== input.newPasswordConfirm) {
+            throw new CustomError(
+                "Password and Password Confirmation must match",
+                400
+            );
+        }
+
+        await teamMemberService.changePassword(teamMember.id, input);
+
+        res.status(200).json({
+            message: "Password successfully updated"
+        });
+    });
+
+    
+
 }
+
+
 
 export const teamMemberController = new TeamMemberController();

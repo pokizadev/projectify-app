@@ -34,7 +34,7 @@ adminRouter.patch(
     adminController.updateTask
 );
 
-adminRouter.delete(
+adminRouter.patch(
     "/me/tasks/:taskId/delete",
     authMiddleware.authenticate, authMiddleware.isAdmin,
     adminController.deleteTask

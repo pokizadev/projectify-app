@@ -36,6 +36,12 @@ teamMemberRouter.patch(
     teamMemberController.reactivate
 );
 
-teamMemberRouter.post("/login",  teamMemberController.login)
+teamMemberRouter.post("/login",  teamMemberController.login);
+
+teamMemberRouter.patch("/forgotPassword", authMiddleware.isTeamMember, teamMemberController.resetPassword)
+
+teamMemberRouter.patch("/resetPassword", authMiddleware.isTeamMember, teamMemberController.resetPassword)
+
+teamMemberRouter.patch("/change-password", authMiddleware.authenticate, authMiddleware.isTeamMember, teamMemberController.changePassword)
 
 export { teamMemberRouter };
