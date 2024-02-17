@@ -10,18 +10,28 @@ class TeamMemberService {
         const inviteToken = crypto.createToken();
         const hashedInviteToken = crypto.hash(inviteToken);
 
-        await prisma.teamMember.create({
+        const teamMember = await prisma.teamMember.create({
             data: {
                 ...input,
                 adminId: adminId,
                 inviteToken: hashedInviteToken
-            }
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                position: true,
+                joinDate: true,
+                email: true,
+                status: true,
+            },
         });
 
         await mailer.sendCreatePasswordInviteToTeamMember(
             input.email,
             inviteToken
         );
+        return teamMember
     };
 
     createPassword = async (inviteToken, password, email) => {
@@ -58,8 +68,10 @@ class TeamMemberService {
                 id: true,
                 firstName: true,
                 lastName: true,
+                email: true,
                 position: true,
-                createdAt: true
+                status: true,
+                joinDate: true
             }
         });
         return teamMembers;

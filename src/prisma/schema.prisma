@@ -88,6 +88,7 @@ model TeamMember {
     lastName    String
     position    String
     email       String        @unique
+    joinDate    DateTime
     password    String?
     status      TeamMemberAccountStatus @default(INACTIVE)
     adminId     String        @db.ObjectId
