@@ -22,6 +22,13 @@ projectRouter.patch(
     projectController.reactivateContributor
 );
 
+projectRouter.patch(
+    "/:id/onhold",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    projectController.onhold
+);
+
 projectRouter.post("/", authMiddleware.authenticate, projectController.create);
 projectRouter.get(
     "/:id",

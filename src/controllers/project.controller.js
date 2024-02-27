@@ -21,6 +21,12 @@ class ProjectController {
             throw new CustomError("All fields are required", 400);
         }
 
+        if(new Date(input.startDate) >= new Date(input.endDate)) {
+            throw new CustomError(
+                "Start Date cannot be greater than End Date"
+            )
+        }
+
         const project = await projectService.create(input, adminId);
 
         res.status(201).json({
@@ -79,6 +85,13 @@ class ProjectController {
         await projectService.changeStatus(params.id, adminId, "ACTIVE");
         res.status(204).send();
     });
+
+    onhold = catchAsync(async (req, res) => {
+        const {params, adminId} = req;
+
+        await projectService.changeStatus(params.id, adminId, "ONHOLD")
+        res.status(204).send()
+    })
 
     addContributor = catchAsync(async (req, res) => {
         const { adminId, body } = req;
