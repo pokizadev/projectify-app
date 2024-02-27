@@ -82,21 +82,21 @@ class TeamMemberController {
     });
 
     deactivate = catchAsync(async (req, res) => {
-        const { adminId, body } = req;
+        const { adminId, params } = req;
 
         await teamMemberService.changeStatus(
             adminId,
-            body.teamMemberId,
+            params.id,
             "DEACTIVATED"
         );
         res.status(204).send();
     });
 
     reactivate = catchAsync(async (req, res) => {
-        const { adminId, body } = req;
+        const { adminId, params } = req;
         await teamMemberService.changeStatus(
             adminId,
-            body.teamMemberId,
+            params.id,
             "ACTIVE"
         );
 
@@ -213,8 +213,8 @@ class TeamMemberController {
     });
 
     delete = catchAsync(async (req, res) => {
-        const { adminId, body } = req;
-        await teamMemberService.delete(adminId, body.teamMemberId);
+        const { adminId, params } = req;
+        await teamMemberService.delete(adminId, params.id);
 
         res.status(204).send();
     });

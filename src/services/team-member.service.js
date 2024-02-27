@@ -23,15 +23,15 @@ class TeamMemberService {
                 position: true,
                 joinDate: true,
                 email: true,
-                status: true,
-            },
+                status: true
+            }
         });
 
         await mailer.sendCreatePasswordInviteToTeamMember(
             input.email,
             inviteToken
         );
-        return teamMember
+        return teamMember;
     };
 
     createPassword = async (inviteToken, password, email) => {
@@ -49,7 +49,7 @@ class TeamMemberService {
 
         await prisma.teamMember.update({
             where: {
-                email: email.toLowerCase(),
+                email: email.toLowerCase()
             },
             data: {
                 password: hashedPassword,
@@ -80,13 +80,26 @@ class TeamMemberService {
     changeStatus = async (adminId, teamMemberId, status) => {
         const teamMember = await prisma.teamMember.findFirst({
             where: {
-                adminId: adminId,
                 id: teamMemberId
             }
         });
         if (!teamMember) {
             throw new CustomError(
-                "Forbidden: Team member does not belong to your team",
+                `Team member does not exist with following id ${teamMemberId}`,
+                404
+            );
+        }
+
+        if (teamMember.adminId !== adminId) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                403
+            );
+        }
+
+        if (teamMember.status === "INACTIVE") {
+            throw new CustomError(
+                "Status Change is now allowed. Users with INACTIVE status can be deleted only!",
                 403
             );
         }
@@ -203,7 +216,7 @@ class TeamMemberService {
     getMe = async (id) => {
         const teamMember = await prisma.teamMember.findUnique({
             where: {
-                id,
+                id
             },
             select: {
                 firstName: true,
@@ -212,8 +225,8 @@ class TeamMemberService {
                 status: true,
                 email: true,
                 id: true,
-                adminId: true,
-            },
+                adminId: true
+            }
         });
 
         if (!teamMember) {
@@ -301,13 +314,13 @@ class TeamMemberService {
             select: {
                 password: true
             }
-        })
+        });
 
         if (!teamMember) {
             throw new CustomError("Team member does not exist", 404);
         }
 
-        const hashedPassword = await bcrypt.hash(input.newPassword)
+        const hashedPassword = await bcrypt.hash(input.newPassword);
         const passwordMatch = await bcrypt.compare(
             hashedPassword,
             teamMember.password
@@ -325,41 +338,44 @@ class TeamMemberService {
                 password: hashedPassword
             }
         });
-    }
+    };
 
     delete = async (adminId, teamMemberId) => {
-        const teamMember = await prisma.teamMember.findFirst({
+        const teamMember = await prisma.teamMember.findUnique({
             where: {
                 id: teamMemberId
             }
-        })
+        });
 
-        if(!teamMember) {
+        if (!teamMember) {
             throw new CustomError(
-                `Team member does not exist with following id ${teamMemberId}`, 404
-            )
+                `Team member does not exist with following id ${teamMemberId}`,
+                404
+            );
         }
 
-        if(teamMember.adminId !== adminId) {
+        if (teamMember.adminId !== adminId) {
             throw new CustomError(
-                "Forbidden: You are not authorized to perform this action", 403
-            )
+                "Forbidden: You are not authorized to perform this action",
+                403
+            );
         }
 
-        if(
+        if (
             teamMember.status === "ACTIVE" ||
             teamMember.status === "DEACTIVATED"
         ) {
             throw new CustomError(
-                "Only users with INACTIVE status can be deleted!"
-            )
+                "Only users with INACTIVE status can be deleted!",
+                404
+            );
         }
         await prisma.teamMember.delete({
             where: {
                 id: teamMemberId
             }
-        })
-    }
+        });
+    };
 }
 
 export const teamMemberService = new TeamMemberService();
