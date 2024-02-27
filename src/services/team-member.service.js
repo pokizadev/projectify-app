@@ -376,6 +376,18 @@ class TeamMemberService {
             }
         });
     };
+
+    update = async(adminId, teamMemberId, updateData) => {
+        await prisma.teamMember.update({
+            where: {
+                id: teamMemberId,
+                adminId: adminId
+            },
+            data: {
+                ...updateData
+            }
+        })
+    }
 }
 
 export const teamMemberService = new TeamMemberService();

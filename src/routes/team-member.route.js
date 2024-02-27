@@ -52,4 +52,12 @@ teamMemberRouter.delete(
     teamMemberController.delete
 );
 
+teamMemberRouter.patch(
+    "/:id/update",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    teamMemberController.update
+);
+
+
 export { teamMemberRouter };

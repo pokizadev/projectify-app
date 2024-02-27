@@ -84,21 +84,13 @@ class TeamMemberController {
     deactivate = catchAsync(async (req, res) => {
         const { adminId, params } = req;
 
-        await teamMemberService.changeStatus(
-            adminId,
-            params.id,
-            "DEACTIVATED"
-        );
+        await teamMemberService.changeStatus(adminId, params.id, "DEACTIVATED");
         res.status(204).send();
     });
 
     reactivate = catchAsync(async (req, res) => {
         const { adminId, params } = req;
-        await teamMemberService.changeStatus(
-            adminId,
-            params.id,
-            "ACTIVE"
-        );
+        await teamMemberService.changeStatus(adminId, params.id, "ACTIVE");
 
         res.status(204).send();
     });
@@ -218,7 +210,31 @@ class TeamMemberController {
 
         res.status(204).send();
     });
-    
+
+    update = catchAsync(async (req, res) => {
+        const {
+            adminId,
+            params,
+            body: { firstName, lastName, position, joinDate },
+            body
+        } = req;
+        const updateData = {}
+        if(firstName) {
+            updateData.firstName = firstName
+        }
+        if(lastName) {
+            updateData.lastName = lastName;
+        }
+        if(position) {
+            updateData.position = position;
+        }
+        if(joinDate) {
+            updateData.joinDate = joinDate
+        }
+
+        await teamMemberService.update(adminId, params.id, updateData)
+        res.status(204).send()
+    });
 }
 
 export const teamMemberController = new TeamMemberController();
