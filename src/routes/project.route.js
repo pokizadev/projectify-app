@@ -4,6 +4,16 @@ import { projectController } from "../controllers/project.controller.js";
 
 const projectRouter = Router();
 
+projectRouter.post("/", authMiddleware.authenticate, projectController.create);
+
+projectRouter.get("/", authMiddleware.authenticate, projectController.getAll);
+
+projectRouter.get(
+    "/:id",
+    authMiddleware.authenticate,
+    projectController.getOne
+);
+
 projectRouter.post(
     "/contributors/add",
     authMiddleware.authenticate,
@@ -17,41 +27,16 @@ projectRouter.patch(
 );
 
 projectRouter.patch(
-    "/contributors/reactivate",
-    authMiddleware.authenticate,
-    projectController.reactivateContributor
-);
-
-projectRouter.patch(
-    "/:id/onhold",
-    authMiddleware.authenticate,
-    authMiddleware.isAdmin,
-    projectController.onhold
-);
-
-projectRouter.post("/", authMiddleware.authenticate, projectController.create);
-projectRouter.get(
-    "/:id",
-    authMiddleware.authenticate,
-    projectController.getOne
-);
-
-projectRouter.patch(
     "/:id",
     authMiddleware.authenticate,
     projectController.update
 );
-projectRouter.get("/", authMiddleware.authenticate, projectController.getAll);
 
 projectRouter.patch(
-    "/:id/archive",
+    "/:id/change-status",
     authMiddleware.authenticate,
-    projectController.archive
-);
-projectRouter.patch(
-    "/:id/reactivate",
-    authMiddleware.authenticate,
-    projectController.reactivate
+    authMiddleware.isAdmin,
+    projectController.changeStatus
 );
 
 export { projectRouter };
