@@ -47,7 +47,7 @@ class TeamMemberController {
         if (!prefix || !token) {
             throw new CustomError("Not Valid Token", 400);
         }
-        
+
         if (!token) {
             throw new CustomError("Invite Token is missing", 400);
         }
@@ -109,14 +109,16 @@ class TeamMemberController {
         } = req;
 
         if (!email || !password) {
-            throw new CustomError ("All fields required: name and password", 400);
+            throw new CustomError(
+                "All fields required: name and password",
+                400
+            );
         }
 
-        const jwt = await teamMemberService.login(email, password)
+        const jwt = await teamMemberService.login(email, password);
         res.status(200).json({
             token: jwt
         });
-         
     });
 
     getMe = catchAsync(async (req, res) => {
@@ -124,20 +126,21 @@ class TeamMemberController {
         const me = await teamMemberService.getMe(teamMember.id);
 
         res.status(200).json({
-            data: me,
+            data: me
         });
     });
 
-    forgotPassword = catchAsync(async(req, res) => {
+    forgotPassword = catchAsync(async (req, res) => {
         const {
-            body: {email}
+            body: { email }
         } = req;
-    
+
         await teamMemberService.forgotPassword(email);
-            res.status(200).json({
-                message: "We emailed you an instruction to reset your password. Follow it!"
-            });
-    })
+        res.status(200).json({
+            message:
+                "We emailed you an instruction to reset your password. Follow it!"
+        });
+    });
 
     resetPassword = catchAsync(async (req, res) => {
         const {
@@ -209,10 +212,13 @@ class TeamMemberController {
         });
     });
 
+    delete = catchAsync(async (req, res) => {
+        const { adminId, body } = req;
+        await teamMemberService.delete(adminId, body.teamMemberId);
+
+        res.status(204).send();
+    });
     
-
 }
-
-
 
 export const teamMemberController = new TeamMemberController();

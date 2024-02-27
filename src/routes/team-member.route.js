@@ -44,4 +44,12 @@ teamMemberRouter.patch("/resetPassword", authMiddleware.isTeamMember, teamMember
 
 teamMemberRouter.patch("/change-password", authMiddleware.authenticate, authMiddleware.isTeamMember, teamMemberController.changePassword)
 
+
+teamMemberRouter.delete(
+    "/delete",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    teamMemberController.delete
+);
+
 export { teamMemberRouter };
