@@ -38,7 +38,7 @@ enum TaskStatus {
     DONE
 }
 
-enum TeamMemberProjectStatus {
+enum ContributorStatus {
     ACTIVE
     INACTIVE
 }
@@ -102,11 +102,11 @@ model TeamMember {
     updatedAt   DateTime      @updatedAt
 }
 
-model TeamMemberProject {
+model Contributor {
     id           String                  @id @default(auto()) @map("_id") @db.ObjectId
     teamMemberId String                  @db.ObjectId
     projectId    String                  @db.ObjectId
-    status       TeamMemberProjectStatus @default(ACTIVE)
+    status       ContributorStatus @default(ACTIVE)
     joinedAt     DateTime                @default(now())
 
     createdAt   DateTime                @default(now())
