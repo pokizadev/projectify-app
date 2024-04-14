@@ -114,14 +114,14 @@ class ProjectController {
             );
         }
 
-        await projectService.addContributor(
+        const data = await projectService.addContributor(
             params.id,
             body.teamMemberId,
             adminId
         );
 
         res.status(200).json({
-            message: "Team Member has been successfully added as a contributor!"
+            message: "Team Member has been successfully added as a contributor!", data
         });
     });
 
@@ -148,6 +148,19 @@ class ProjectController {
         );
 
         res.status(204).send();
+    });
+
+    getContributors = catchAsync(async (req, res) => {
+        const { adminId, params } = req;
+
+        const contributors = await projectService.getContributors(
+            params.id,
+            adminId
+        );
+
+        res.status(200).json({
+            data: contributors,
+        });
     });
 }
 
