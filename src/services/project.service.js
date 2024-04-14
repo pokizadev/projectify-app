@@ -97,6 +97,7 @@ class ProjectService {
             select: {
                 status: true,
                 joinedAt: true,
+                teamMemberId: true
             },
         });
 
