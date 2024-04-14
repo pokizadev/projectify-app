@@ -34,16 +34,9 @@ projectRouter.post(
 );
 
 projectRouter.patch(
-    "/:id/contributors/:contributorId/deactivate",
+    "/:id/contributors/:teamMemberId/change-status",
     authMiddleware.authenticate,
-    projectController.deactivateContributor
-);
-
-projectRouter.patch(
-    "/:id/contributors/:contributorId/reactivate",
-    authMiddleware.authenticate,
-    authMiddleware.isAdmin,
-    projectController.reactivateContributor
+    projectController.changeContributorStatus
 );
 
 projectRouter.get(
