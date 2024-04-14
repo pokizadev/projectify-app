@@ -14,18 +14,6 @@ projectRouter.get(
     projectController.getOne
 );
 
-projectRouter.post(
-    "/contributors/add",
-    authMiddleware.authenticate,
-    projectController.addContributor
-);
-
-projectRouter.patch(
-    "/contributors/deactivate",
-    authMiddleware.authenticate,
-    projectController.deactivateContributor
-);
-
 projectRouter.patch(
     "/:id",
     authMiddleware.authenticate,
@@ -38,5 +26,32 @@ projectRouter.patch(
     authMiddleware.isAdmin,
     projectController.changeStatus
 );
+
+projectRouter.post(
+    "/:id/contributors/add",
+    authMiddleware.authenticate,
+    projectController.addContributor
+);
+
+projectRouter.patch(
+    "/:id/contributors/:contributorId/deactivate",
+    authMiddleware.authenticate,
+    projectController.deactivateContributor
+);
+
+projectRouter.patch(
+    "/:id/contributors/:contributorId/reactivate",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    projectController.reactivateContributor
+);
+
+projectRouter.get(
+    "/:id/contributors",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    projectController.getContributors
+);
+
 
 export { projectRouter };
